@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:calculadora_imc/models/Pessoa.dart';
 
 void main() => runApp(
       MaterialApp(
@@ -18,7 +19,10 @@ class _HomeState extends State<Home> {
 
   TextEditingController _weightController = TextEditingController();
   TextEditingController _heightController = TextEditingController();
+  bool isFemale = true;
   String _result;
+  Pessoa pessoa = Pessoa();
+
 
   @override
   void initState() {
@@ -40,7 +44,7 @@ class _HomeState extends State<Home> {
         appBar: buildAppBar(),
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
-            padding: EdgeInsets.all(20.0), child: buildForm()));
+        padding: EdgeInsets.all(20.0), child: buildForm()));
   }
 
   AppBar buildAppBar() {
@@ -72,6 +76,12 @@ class _HomeState extends State<Home> {
               label: "Altura (cm)",
               error: "Insira uma altura!",
               controller: _heightController),
+          buildRowGenderSwitch(
+              isSwitched: isFemale,
+              switchHandle: (value) {
+                isFemale = value;
+              }
+          ),
           buildTextResult(),
           buildCalculateButton(),
         ],
@@ -82,22 +92,11 @@ class _HomeState extends State<Home> {
   void calculateImc() {
     double weight = double.parse(_weightController.text);
     double height = double.parse(_heightController.text) / 100.0;
-    double imc = weight / (height * height);
+
+    Pessoa pessoa = Pessoa(weight: weight, height: height, gender: isFemale);
 
     setState(() {
-      _result = "IMC = ${imc.toStringAsPrecision(2)}\n";
-      if (imc < 18.6)
-        _result += "Abaixo do peso";
-      else if (imc < 25.0)
-        _result += "Peso ideal";
-      else if (imc < 30.0)
-        _result += "Levemente acima do peso";
-      else if (imc < 35.0)
-        _result += "Obesidade Grau I";
-      else if (imc < 40.0)
-        _result += "Obesidade Grau II";
-      else
-        _result += "Obesidade Grau IIII";
+      _result = pessoa.calculateImc();
     });
   }
 
@@ -116,11 +115,14 @@ class _HomeState extends State<Home> {
   }
 
   Widget buildTextResult() {
+    print('ooooi: ');
+    print(pessoa.materializeColorScale);
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 36.0),
       child: Text(
         _result,
         textAlign: TextAlign.center,
+        style: TextStyle(color: Colors.red[pessoa.materializeColorScale ?? 100]),
       ),
     );
   }
@@ -134,6 +136,31 @@ class _HomeState extends State<Home> {
       validator: (text) {
         return text.isEmpty ? error : null;
       },
+    );
+  }
+  
+  Widget buildSwitch({bool isSwitched, Function switchHandler}) {
+    return Switch(
+      value: isSwitched,
+      onChanged: (value) {
+        setState(switchHandler(value));
+      },
+      activeTrackColor: Colors.pink,
+      activeColor: Colors.pinkAccent,
+      inactiveTrackColor: Colors.blueAccent, 
+      inactiveThumbColor: Colors.blue,
+    );
+  }
+
+  Widget buildRowGenderSwitch({bool isSwitched, Function switchHandle}) {
+    return Center(
+      child: Row(
+        children: <Widget> [
+          Text('Masculino', textAlign: TextAlign.left),
+          buildSwitch(isSwitched: isSwitched, switchHandler: switchHandle),
+          Text('Feminino', textAlign: TextAlign.right)
+        ]
+      )
     );
   }
 }
