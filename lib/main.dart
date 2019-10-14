@@ -102,7 +102,7 @@ class _HomeState extends State<Home> {
 
   Widget buildCalculateButton() {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 36.0),
+      padding: EdgeInsets.symmetric(vertical: 12.0),
       child: RaisedButton(
         onPressed: () {
           if (_formKey.currentState.validate()) {
@@ -115,14 +115,16 @@ class _HomeState extends State<Home> {
   }
 
   Widget buildTextResult() {
-    print('ooooi: ');
-    print(pessoa.materializeColorScale);
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 36.0),
       child: Text(
         _result,
         textAlign: TextAlign.center,
-        style: TextStyle(color: Colors.red[pessoa.materializeColorScale ?? 100]),
+        style: TextStyle(
+          color: Colors.red[pessoa.materializeColorScale ?? 100],
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
